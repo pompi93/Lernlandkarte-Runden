@@ -1,0 +1,117 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Lernlandkarte: Zahlen runden</title>
+<style>
+:root{--bg:#EAF6FF;--card:#fff;--ink:#1F2A44;--pri:#8FB4FF;--ok:#1E7B4B;--okb:#DDF3E4;--no:#A24B00;--nob:#FFE7CC;--mute:#4A5878;--ln:#B9D3EE;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--pri:#2F5DA8}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0F1B2E;--card:#1B2A44;--ink:#EEF3FF;--ok:#7BE0A4;--okb:#12392A;--no:#FFB877;--nob:#4A2C10;--mute:#B2C0DD;--ln:#2E4466;--pri:#8FB4FF}}
+:root[data-theme=dark]{--bg:#0F1B2E;--card:#1B2A44;--ink:#EEF3FF;--ok:#7BE0A4;--okb:#12392A;--no:#FFB877;--nob:#4A2C10;--mute:#B2C0DD;--ln:#2E4466;--pri:#8FB4FF}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Nunito,'Trebuchet MS',sans-serif;-webkit-text-size-adjust:100%}
+#app{max-width:760px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:34px;margin:6px 0}h2{font-size:26px;margin:0}p{font-size:19px;line-height:1.5;margin:8px 0}
+.top{background:#2F5DA8;color:#fff;border-radius:20px;padding:16px 20px;margin-bottom:14px}.top p{margin:2px 0}
+button{font:inherit;cursor:pointer;border:0;border-radius:16px;min-height:56px;padding:10px 22px;font-size:20px;font-weight:800;background:#2F5DA8;color:#fff;touch-action:manipulation}
+button.g{background:var(--card);color:var(--ink);border:3px solid var(--ln)}button:disabled{opacity:.55}
+.nd{display:flex;align-items:center;gap:14px;width:82%;text-align:left;background:var(--card);color:var(--ink);border:3px solid var(--lb,var(--ln));min-height:84px}
+.nd.r{margin-left:auto}.nd .e{font-size:40px}.nd b{display:block;font-size:21px}.nd small{font-size:15px;color:var(--mute);font-weight:600}
+.dots{text-align:center;color:var(--mute);font-size:22px;letter-spacing:6px;margin:4px 0}
+.card{background:var(--card);border-radius:22px;padding:20px;box-shadow:0 2px 0 var(--ln);margin:12px 0}
+.num{font-size:52px;font-weight:900;text-align:center;margin:10px 0;letter-spacing:1px}
+.o{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input{font:inherit;font-size:34px;font-weight:800;width:100%;box-sizing:border-box;padding:12px;border-radius:14px;border:3px solid var(--ln);background:var(--bg);color:var(--ink);text-align:center;margin:10px 0}
+.fb{border-radius:16px;padding:14px 16px;margin:12px 0;font-size:19px;line-height:1.5}.fb.ok{background:var(--okb);color:var(--ok)}.fb.no{background:var(--nob);color:var(--no)}
+.fb .n2{font-size:32px;font-weight:900;text-align:center;color:var(--ink)}u{text-decoration:underline 4px;text-underline-offset:6px}.r{color:var(--no)}
+.pr{display:flex;gap:8px;margin:6px 0}.pr i{flex:1;height:12px;border-radius:8px;background:var(--ln)}.pr i.d{background:#2F9E62}.pr i.c{background:#2F5DA8}
+.code{font-size:34px;font-weight:900;text-align:center;border:4px dashed #2F5DA8;border-radius:18px;padding:16px;letter-spacing:2px;margin:14px 0}
+</style></head><body><div id="app"></div><script>
+/*CORE*/
+const P={10:'Zehner',100:'Hunderter',1000:'Tausender',10000:'Zehntausender',100000:'Hunderttausender'},PL=[10,100,1000,10000,100000];
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f'),rnd=(n,p)=>Math.floor(n/p+.5)*p,dn=(n,p)=>Math.floor(n/p)*p,dg=(n,p)=>Math.floor(n/(p/10))%10;
+const parse=a=>{const s=String(a).replace(/[\s.\u202f']/g,'');return /^\d+$/.test(s)?+s:NaN};
+function hi(n,p){const s=fmt(n),k=Math.round(Math.log10(p));let d=0,o='';for(let i=s.length-1;i>=0;i--){const c=s[i];if(!/\d/.test(c)){o=c+o;continue}o=(d==k?'<u>'+c+'</u>':d==k-1?'<b class="r">'+c+'</b>':c)+o;d++}return o}
+function analyse(n,p,a){const r=rnd(n,p),lo=dn(n,p),d=dg(n,p),carry=r!==lo&&Math.floor(n/p)%10==9;let m;
+ if(a===r)return{ok:1};
+ const q=PL.find(x=>x!==p&&rnd(n,x)===a);
+ if(a===n)m='Du hast die Zahl gar nicht gerundet. Beim Runden auf '+P[p]+' werden alle Ziffern rechts von der unterstrichenen Stelle zu 0.';
+ else if(q)m='Du hast auf '+P[q]+' gerundet. Gefragt ist aber '+P[p]+'. Unterstreiche zuerst die richtige Stelle!';
+ else if(a===lo&&r!==lo)m='Du hast abgerundet. Die Ziffer rechts daneben ist eine '+d+'. Bei 5, 6, 7, 8 oder 9 wird aufgerundet.'+(carry?' Achtung Übertrag: 9 + 1 = 10, du schreibst 0 und erhöhst die Stelle davor um 1.':'');
+ else if(a===lo+p&&r===lo)m='Du hast aufgerundet. Die Ziffer rechts daneben ist eine '+d+'. Bei 0, 1, 2, 3 oder 4 wird abgerundet, die unterstrichene Ziffer bleibt.';
+ else if(PL.find(x=>x!==p&&dn(n,x)===a))m='Dein Ergebnis passt nicht zur gefragten Stelle. Gefragt ist '+P[p]+': Unterstreiche diese Stelle und schau auf die Ziffer rechts daneben.';
+ else if(carry)m='Achtung Übertrag: Die unterstrichene Ziffer ist eine 9. Beim Aufrunden wird 9 + 1 = 10, du schreibst 0 und erhöhst die Stelle davor um 1.';
+ else if(a%p!==0)m='Beim Runden auf '+P[p]+' werden alle Ziffern rechts von der unterstrichenen Stelle zu 0. Dein Ergebnis endet nicht richtig.';
+ else m='Das stimmt noch nicht. Unterstreiche die Stelle, schau auf die Ziffer rechts daneben und überlege: ab- oder aufrunden?';
+ return{ok:0,m}}
+const solve=(n,p)=>{const d=dg(n,p);return 'Unterstreiche die '+P[p]+'stelle. Die Ziffer rechts daneben ist eine '+d+' → '+(d>=5?'aufrunden':'abrunden')+'. Ergebnis: '+fmt(rnd(n,p))+'.'};
+const sm=a=>a.reduce((x,y)=>x+(y||0),0);
+const R=(n,p,h)=>({n,p,h,q:'Runde auf '+P[p]+'.',chk:a=>analyse(n,p,a),sol:solve(n,p)});
+const C=(q,o,a,w)=>({q,o,chk:i=>i===a?{ok:1}:{ok:0,m:w},sol:'Richtig ist: '+o[a]+'. '+w});
+function nl(n,lo,p){const x=v=>40+(v-lo)/p*400,t=v=>`<line x1="${x(v)}" y1="38" x2="${x(v)}" y2="62" stroke="currentColor" stroke-width="3"/><text x="${x(v)}" y="88" text-anchor="middle" font-size="15" font-weight="700" fill="currentColor">${fmt(v)}</text>`;let k='';for(let j=1;j<10;j++)if(j!=5)k+=`<line x1="${40+j*40}" y1="45" x2="${40+j*40}" y2="55" stroke="currentColor" stroke-width="2"/>`;
+ return `<svg viewBox="0 0 480 100" width="100%" role="img" aria-label="Zahlenstrahl von ${fmt(lo)} bis ${fmt(lo+p)} mit dem Punkt ${fmt(n)}"><line x1="30" y1="50" x2="450" y2="50" stroke="currentColor" stroke-width="3"/>${k}${t(lo)}${t(lo+p/2)}${t(lo+p)}<circle cx="${x(n)}" cy="50" r="9" style="fill:var(--no)"/><text x="${x(n)}" y="26" text-anchor="middle" font-size="16" font-weight="900" style="fill:var(--no)">${fmt(n)}</text></svg>`}
+const L=(n,p)=>{const lo=dn(n,p),mid=lo+p/2,a=rnd(n,p)===lo?0:1,o=[fmt(lo),fmt(lo+p)],w=n===mid?'Der Punkt liegt genau in der Mitte ('+fmt(mid)+'). Dann wird aufgerundet.':'Der Punkt liegt '+(n<mid?'links':'rechts')+' von der Mitte ('+fmt(mid)+'), also näher an '+o[a]+'.';
+ return{n:0,svg:nl(n,lo,p),q:'Auf welche Zahl rundest du '+fmt(n)+' auf '+P[p]+'?',o,chk:i=>i===a?{ok:1}:{ok:0,m:w},sol:'Richtig ist: '+o[a]+'. '+w}};
+const Q=(q,chk,sol)=>({q,chk,sol});
+const RD=(q,cs,sol)=>Q(q,a=>{const b=cs.filter(([p,t])=>rnd(a,p)!==t);return b.length?{ok:0,m:fmt(a)+' passt nicht: '+b.map(([p,t])=>'Auf '+P[p]+' gerundet wird daraus '+fmt(rnd(a,p))+' (gesucht: '+fmt(t)+')').join('. ')+'.'}:{ok:1}},sol);
+const KN=(q,ans,tgt,p,min,sol)=>Q(q,a=>{if(a===ans)return{ok:1};const r=rnd(a,p);return{ok:0,m:r!==tgt?(a%p===0?fmt(a)+' ist schon ein voller '+P[p]+'. Gesucht ist eine Zahl, die erst durch '+(min?'Aufrunden':'Abrunden')+' zu '+fmt(tgt)+' wird.':fmt(a)+' wird auf '+P[p]+' zu '+fmt(r)+', nicht zu '+fmt(tgt)+'.'):fmt(a)+' gehört dazu, aber es gibt eine '+(min?'kleinere':'größere')+' Zahl. Probiere '+fmt(min?ans-1:ans+1)+': Sie wird zu '+fmt(rnd(min?ans-1:ans+1,p))+'.'}},sol);
+const REG='Bei 0, 1, 2, 3 oder 4 wird abgerundet. Die unterstrichene Ziffer bleibt, alle Ziffern rechts davon werden 0.';
+const ST=[
+{k:'m',n:'Startinsel',e:'🏝️',d:'Die Rundungsregel',t:[
+ C('Die Ziffer rechts neben der unterstrichenen Stelle ist eine 3. Was machst du?',['abrunden','aufrunden'],0,REG),
+ C('Die Ziffer rechts neben der unterstrichenen Stelle ist eine 5. Was machst du?',['abrunden','aufrunden'],1,'Schon die 5 reicht zum Aufrunden: Bei 5, 6, 7, 8 oder 9 wird aufgerundet. Die unterstrichene Ziffer wird um 1 größer.'),
+ C('Du rundest 819 472 auf Tausender. Welche Ziffer entscheidet?',['9','8','4','7'],2,'Die Tausenderstelle ist die 9. Entscheidend ist die Ziffer direkt rechts daneben: die 4. Also wird abgerundet.')]},
+{k:'m',n:'Zehnerstrand',e:'🐚',d:'Runden auf Zehner',t:[R(176283,10),R(333555,10),R(51774,10),R(608995,10)]},
+{k:'m',n:'Tausenderwald',e:'🌴',d:'Hunderter und Tausender',t:[R(51774,100),R(495140,100),R(176283,1000),R(333555,1000)]},
+{k:'m',n:'Zehntausenderberg',e:'⛰️',d:'Runden auf Zehntausender',t:[R(176283,10000),R(819472,10000),R(51774,10000),R(495140,10000)]},
+{k:'m',n:'Zahlenstrahl-Brücke',e:'🌉',d:'Runden am Zahlenstrahl',t:[L(245817,10000),L(31249,1000),L(768350,100000),L(125500,1000)]},
+{k:'m',n:'Schatzhöhle',e:'💎',d:'Hunderttausender und Knobelei',t:[R(51774,100000),R(495140,100000),R(213600,100000),KN('Knobelaufgabe: Welche ist die kleinste Zahl, die auf Tausender gerundet 52 000 ergibt?',51500,52000,1000,1,'51 500 hat an der Hunderterstelle eine 5 und wird aufgerundet zu 52 000. 51 499 hat eine 4 und wird abgerundet zu 51 000. Also ist 51 500 die kleinste Zahl.')]},
+{k:'b',n:'Blitz-Bucht',e:'⚡',d:'Bonus für Schnelle: Münzen sammeln',intro:'Kapitän Rund braucht glatte Zahlen für seine Schatzkarte. Sammle Goldmünzen: 2 Münzen gibt es für richtig beim ersten Versuch. Wie schnell bist du?',t:[R(480500,1000),R(641953,100),R(97481,10000),R(729999,10)]},
+{k:'b',n:'Drachenhöhle',e:'🐉',d:'Bonus für Superschnelle: Zahlenrätsel',intro:'Der Rätsel-Drache bewacht den Diamanten. Löse seine Zahlenrätsel! Oft gibt es mehrere richtige Zahlen, du musst nur eine finden.',t:[
+ RD('Finde eine Zahl, die auf Hunderter gerundet 47 300 und auf Tausender gerundet 47 000 ergibt.',[[100,47300],[1000,47000]],'Auf Tausender gerundet 47 000 heißt: von 46 500 bis 47 499. Auf Hunderter gerundet 47 300 heißt: von 47 250 bis 47 349. Beides passt bei 47 250 bis 47 349, zum Beispiel 47 300.'),
+ RD('Finde eine Zahl, die auf Zehntausender gerundet 350 000 und auf Hunderttausender gerundet 400 000 ergibt.',[[10000,350000],[100000,400000]],'Auf Hunderttausender gerundet 400 000 heißt: von 350 000 bis 449 999. Auf Zehntausender gerundet 350 000 heißt: von 345 000 bis 354 999. Beides passt bei 350 000 bis 354 999.'),
+ KN('Welche ist die kleinste Zahl, die auf Zehntausender gerundet 200 000 ergibt?',195000,200000,10000,1,'195 000 hat an der Tausenderstelle eine 5 und wird aufgerundet zu 200 000. 194 999 wird abgerundet zu 190 000.'),
+ KN('Welche ist die größte Zahl, die auf Zehntausender gerundet 500 000 ergibt?',504999,500000,10000,0,'504 999 hat an der Tausenderstelle eine 4 und wird abgerundet zu 500 000. 505 000 wird aufgerundet zu 510 000.')]},
+{k:'f',n:'Übungsfloß: Regel',e:'🛟',d:'Übungen mit Hilfe',t:[
+ C('Die Ziffer rechts neben der unterstrichenen Stelle ist eine 6. Was machst du?',['abrunden','aufrunden'],1,'Bei 5, 6, 7, 8 oder 9 wird aufgerundet.'),
+ C('Was passiert beim Runden mit allen Ziffern rechts von der unterstrichenen Stelle?',['Sie werden zu 0','Sie bleiben gleich','Sie werden zu 9'],0,'Alle Ziffern rechts von der unterstrichenen Stelle werden zu 0.'),
+ C('Du rundest 245 817 auf Tausender. Welche Ziffer entscheidet?',['5','8','1','7'],1,'Die Tausenderstelle ist die 5. Entscheidend ist die Ziffer direkt rechts daneben: die 8.')]},
+{k:'f',n:'Übungsfloß: Zehner',e:'🛟',d:'Übungen mit Hilfe',t:[R(142276,10,1),R(580533,10,1),R(358692,10,1)]},
+{k:'f',n:'Übungsfloß: Hunderter und Tausender',e:'🛟',d:'Übungen mit Hilfe',t:[R(24618,100,1),R(713450,100,1),R(48392,1000,1)]},
+{k:'f',n:'Übungsfloß: Zehntausender',e:'🛟',d:'Übungen mit Hilfe',t:[R(137428,10000,1),R(62359,10000,1),R(284100,10000,1)]},
+{k:'f',n:'Übungsfloß: Zahlenstrahl',e:'🛟',d:'Übungen mit Hilfe',t:[L(61200,10000),L(238900,10000),L(906000,100000)]}];
+const T=ST;
+const code=pt=>{const g=(a,b)=>{let o='';for(let i=a;i<b;i++)o+=pt[i].every(x=>x!==null)?sm(pt[i]):'x';return o},f=g(8,13),b=g(6,8);
+ const body='RUNDEN-'+pt.slice(0,6).map(sm).join('')+(/\d/.test(f)?'-F'+f:'')+(/\d/.test(b)?'-B'+b:'');
+ return body+'-'+String.fromCharCode(65+[...body].reduce((a,c,i)=>a+c.charCodeAt(0)*(i+3),0)%26)};
+/*END*/
+let S={v:'map',si:0,ti:0,f:0,fb:null,last:'',msg:'',rt:[0,1,2,3,4,5],t0:0,tz:0,pt:ST.map(s=>s.t.map(()=>null))};
+const $=id=>document.getElementById(id),done=i=>S.pt[i].every(x=>x!==null),mx=i=>2*ST[i].t.length,main=()=>S.rt.every(done);
+const star=(p,m)=>p/m>=.85?'★★★':p/m>=.5?'★★☆':p>0?'★☆☆':'☆☆☆';
+const open=i=>ST[i].k=='b'?main():S.rt.slice(0,S.rt.indexOf(i)).every(done);
+function go(i){if(done(i)||!open(i))return;if(i==6&&!S.t0)S.t0=Date.now();S.si=i;S.v='st';S.f=0;S.fb=null;S.last='';S.ti=S.pt[i].findIndex(x=>x===null);draw()}
+function ans(a){const k=ST[S.si].t[S.ti];if(!k.o&&isNaN(a)){S.fb={soft:1,m:'Bitte schreibe eine Zahl mit Ziffern.'};return draw()}
+ S.last=k.o?'':a;const r=k.chk(a);
+ if(r.ok){S.pt[S.si][S.ti]=S.f?1:2;S.fb={ok:1}}else{S.f++;S.fb=S.f>=2?{m:r.m,sol:k.sol,fin:1}:{m:r.m};if(S.f>=2)S.pt[S.si][S.ti]=0}draw()}
+function next(){const i=S.si,j=S.pt[i].findIndex(x=>x===null);S.f=0;S.fb=null;S.last='';S.msg='';
+ if(j>=0){S.ti=j;return draw()}
+ if(i==6)S.tz=Math.round((Date.now()-S.t0)/1000);
+ if(ST[i].k=='m'){if(i==5){S.v='end';return draw()}
+  const d=S.rt.filter(x=>ST[x].k=='m'&&x<=i&&done(x)),g=d.reduce((a,x)=>a+sm(S.pt[x]),0),m=d.reduce((a,x)=>a+mx(x),0),f=8+i;
+  if(g/m<.7&&!S.rt.includes(f)){S.rt.splice(S.rt.indexOf(i)+1,0,f);S.msg='Du bekommst jetzt ein paar Übungsaufgaben mit Hilfe. Danach geht es auf der Karte weiter.';return go(f)}}
+ S.v='map';draw()}
+const tm=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+function node(i,j){const d=done(i),lock=!open(i),s=ST[i],n=s.k=='m'?(S.rt.filter(x=>ST[x].k=='m').indexOf(i)+1)+'. ':'';
+ return `<button class="nd g ${j%2?'r':''}" ${lock?'disabled':''} onclick="go(${i})" style="${d?'--lb:#2F9E62':lock?'':'--lb:#2F5DA8'}"><span class="e">${lock?'🔒':s.e}</span><span><b>${n}${s.n}</b><small>${d?'geschafft '+star(sm(S.pt[i]),mx(i))+' ('+sm(S.pt[i])+' von '+mx(i)+')'+(i==6?' · Zeit '+tm(S.tz):''):s.d}</small></span></button>`}
+function draw(){const A=$('app');
+ if(S.v==='map'){A.innerHTML=`<div class="top"><h1>Die Rundeninsel</h1><p>Finde den Schatz! Löse 6 Stationen. Du brauchst etwa 40 Minuten.</p></div>`+S.rt.map((i,j)=>(j?'<div class="dots">· · ·</div>':'')+node(i,j)).join('')+`<h2 style="margin:22px 0 8px">Bonus für Schnelle</h2><p>${main()?'Du bist schnell! Diese Inseln sind für dich:':'Schaffst du die Hauptroute, öffnen sich zwei Bonus-Inseln.'}</p>`+node(6,0)+'<div class="dots">· · ·</div>'+node(7,1)+(S.rt.every(done)?'<p style="text-align:center"><button onclick="S.v=\'end\';draw()">Mein Schatz und Code</button></p>':'');return}
+ if(S.v==='end'){const c=code(S.pt),tot=S.rt.filter(x=>ST[x].k=='m').reduce((a,x)=>a+sm(S.pt[x]),0),tm_=S.rt.filter(x=>ST[x].k=='m').reduce((a,x)=>a+mx(x),0);A.innerHTML=`<div class="top"><h1>Schatz gefunden! 💎</h1><p>Du hast ${tot} von ${tm_} Punkten auf der Hauptroute.</p></div><div class="card">${[...S.rt,6,7].filter(done).map(i=>`<p>${ST[i].e} ${ST[i].n}: ${star(sm(S.pt[i]),mx(i))} (${sm(S.pt[i])} von ${mx(i)})</p>`).join('')}<p><b>Zeige diesen Code deiner Lehrerin oder deinem Lehrer:</b></p><div class="code">${c}</div><button class="g" onclick="S.v='map';draw()">Zur Karte${done(6)&&done(7)?'':' (Bonus-Inseln)'}</button></div>`;return}
+ const s=ST[S.si],k=s.t[S.ti],p=S.pt[S.si],fb=S.fb,fin=fb&&(fb.ok||fb.fin),first=S.ti==0&&!fb&&!S.f;
+ let h=`<button class="g" onclick="S.v='map';draw()">← Karte</button><div class="top" style="margin-top:12px"><h2>${s.e} ${s.n}</h2><p>Aufgabe ${S.ti+1} von ${s.t.length}</p></div><div class="pr">${p.map((x,i)=>`<i class="${x!==null?'d':i==S.ti?'c':''}"></i>`).join('')}</div>`;
+ if(first&&(S.msg||s.intro))h+=`<div class="fb ok">${S.msg||s.intro}</div>`;
+ h+=`<div class="card"><p><b>${k.q}</b></p>`;
+ if(k.svg)h+=k.svg;
+ if(k.n)h+=`<div class="num">${k.h?hi(k.n,k.p):fmt(k.n)}</div>${k.h?'<p><small>Unterstrichen: die Stelle. Farbig: die Ziffer rechts daneben.</small></p>':''}`;
+ if(k.o&&!fin)h+=`<div class="o">${k.o.map((o,i)=>`<button class="g" onclick="ans(${i})">${o}</button>`).join('')}</div>`;
+ else if(!k.o&&!fin)h+=`<input id="i" inputmode="numeric" autocomplete="off" placeholder="Deine Zahl" value="${S.last===''||isNaN(S.last)?'':S.last}" onkeydown="if(event.key==='Enter')ans(parse(this.value))"><button onclick="ans(parse($('i').value))" style="width:100%">${S.f?'Verbessern und prüfen':'Prüfen'}</button>`;
+ if(fb){if(fb.ok)h+=`<div class="fb ok"><b>Richtig!</b> ${S.f?'Gut verbessert! 👍':'Super, gleich beim ersten Mal! ⭐'}</div>`;
+  else{h+=`<div class="fb no"><b>${fb.soft?'Hinweis':fb.fin?'Das war noch nicht richtig.':'Fast! Schau genau hin:'}</b><br>${fb.m}${k.n&&!k.h&&!fb.soft?`<div class="n2">${hi(k.n,k.p)}</div><small>Unterstrichen: die Stelle. Farbig: die Ziffer rechts daneben.</small>`:''}</div>`;
+   if(fb.fin)h+=`<div class="fb ok"><b>So geht es:</b><br>${fb.sol}</div>`;else if(!fb.soft)h+=`<p>Du hast noch einen Versuch. Verbessere deine Antwort!</p>`}
+  if(fin)h+=`<button onclick="next()" style="width:100%">Weiter</button>`}
+ A.innerHTML=h+'</div>';const e=$('i');if(e&&S.f)e.focus()}
+draw();
+</script></body></html>
